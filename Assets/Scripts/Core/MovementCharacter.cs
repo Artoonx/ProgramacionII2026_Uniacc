@@ -46,7 +46,7 @@ public class MovementCharacter : MonoBehaviour
         }
 
         // Prebuffer: registra intención de salto
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump") && !jumping)
         {
             prebuffTimeCounter = prebuffTime;
         }               
@@ -63,7 +63,8 @@ public class MovementCharacter : MonoBehaviour
        
 
         // Salto: prebuffer + coyote time combinados
-        if (prebuffTimeCounter > 0 && !jumping && IsGrounded() || coyoteTimeCounter > 0 && !jumping)
+        if (prebuffTimeCounter > 0 && !jumping && IsGrounded() || coyoteTimeCounter > 0 
+        && !jumping && Input.GetButtonDown("Jump"))
         {
            Jump();
         }
