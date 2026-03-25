@@ -14,7 +14,12 @@ public class MovementCharacter : MonoBehaviour
     public float prebuffTime = 0.2f;
     private float prebuffTimeCounter;
     public bool jumping;
+    private float originalGravityScale;
 
+    void Start()
+    {
+        originalGravityScale = rb.gravityScale;
+    }
 
     // Update is called once per frame
     void Update()
@@ -22,32 +27,55 @@ public class MovementCharacter : MonoBehaviour
         float xInput = Input.GetAxis("Horizontal");
         rb.linearVelocity = new Vector2(xInput * speed, rb.linearVelocity.y);
 
+        if(rb.linearVelocityY < 0)
+        {
+            rb.gravityScale = originalGravityScale * fallMultiplier;
+        }
+        else if(rb.linearVelocity.y > 0 && !Input.GetButton("Jump"))
+        {
+            rb.gravityScale = originalGravityScale * lowMultiplier;
+        }
+        else
+        {
+            rb.gravityScale = originalGravityScale;
+        }        
+
+        if(prebuffTimeCounter > 0)
+        {
+            prebuffTimeCounter -= Time.deltaTime;
+        }
+
         // Prebuffer: registra intención de salto
         if (Input.GetButtonDown("Jump"))
+        {
             prebuffTimeCounter = prebuffTime;
-        else
-            prebuffTimeCounter -= Time.deltaTime;
-
-        // Coyote time: guarda tiempo desde que dejó el suelo
-        if (IsGrounded())
+        }               
+      
+        if (IsGrounded() && jumping)        
         {
-            coyoteTimeCounter = coyoteTime; // ✅ Se llena cuando está en suelo
-            jumping = false;
+            coyoteTimeCounter = 0; 
+            jumping = false;            
         }
-        else
+        if(!IsGrounded() && !jumping)
         {
-            coyoteTimeCounter -= Time.deltaTime; // ✅ Se vacía al estar en el aire
+            coyoteTimeCounter = coyoteTime; // ✅ Inicia contador de coyote time
         }
+       
 
         // Salto: prebuffer + coyote time combinados
-        if (prebuffTimeCounter > 0 && coyoteTimeCounter > 0 && !jumping)
+        if (prebuffTimeCounter > 0 && !jumping && IsGrounded() || coyoteTimeCounter > 0 && !jumping)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0); // ✅ Resetea velocidad vertical
-            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-            jumping = true;
-            coyoteTimeCounter = 0;  // ✅ Evita doble salto
-            prebuffTimeCounter = 0;
+           Jump();
         }
+    }
+
+    public void Jump()
+    {
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0); // ✅ Resetea velocidad vertical
+        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        jumping = true;
+        coyoteTimeCounter = 0;  // ✅ Evita doble salto
+        prebuffTimeCounter = 0;
     }
     public bool IsGrounded()
     {
