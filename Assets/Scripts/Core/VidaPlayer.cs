@@ -20,7 +20,7 @@ public class VidaPlayer : MonoBehaviour
          
     }
 
-    private void die()
+    public void die()
     {
         GameManager.instance.GameOver();
         gameObject.SetActive(false);
