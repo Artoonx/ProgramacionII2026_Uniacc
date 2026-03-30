@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -27,5 +28,16 @@ public class GameManager : MonoBehaviour
         coinCount += amount;
         coinText.text = "x" + coinCount;
         Debug.Log("Coins: " + coinCount);
+    }
+
+    public void GameOver()
+    {
+        Debug.Log("GameOver");
+        Invoke("restLevel", 2f);
+    }
+
+    void restLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
