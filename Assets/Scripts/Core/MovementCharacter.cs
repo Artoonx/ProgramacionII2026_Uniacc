@@ -15,10 +15,13 @@ public class MovementCharacter : MonoBehaviour
     private float prebuffTimeCounter;
     public bool jumping;
     private float originalGravityScale;
+    public int ExtraJumpsValue =1;
+    private int extraJumps;
 
     void Start()
     {
         originalGravityScale = rb.gravityScale;
+        extraJumps = ExtraJumpsValue;
     }
 
     // Update is called once per frame
@@ -26,6 +29,7 @@ public class MovementCharacter : MonoBehaviour
     {
         float xInput = Input.GetAxis("Horizontal");
         rb.linearVelocity = new Vector2(xInput * speed, rb.linearVelocity.y);
+        
 
         if(rb.linearVelocityY < 0)
         {
@@ -54,7 +58,8 @@ public class MovementCharacter : MonoBehaviour
         if (IsGrounded() && jumping && rb.linearVelocityY < 0)        
         {
             coyoteTimeCounter = 0; 
-            jumping = false;            
+            jumping = false;   
+            extraJumps = ExtraJumpsValue;
         }
         if(!IsGrounded() && !jumping && coyoteTimeCounter <= 0)
         {
@@ -67,10 +72,19 @@ public class MovementCharacter : MonoBehaviour
        
 
         // Salto: prebuffer + coyote time combinados
-        if (prebuffTimeCounter > 0 && !jumping && IsGrounded() || coyoteTimeCounter > 0 
-        && !jumping && Input.GetButtonDown("Jump"))
+        // Salto: prebuffer + coyote time + doble salto
+        if (prebuffTimeCounter > 0)
         {
-           Jump();
+            if (IsGrounded() || coyoteTimeCounter > 0)
+            {
+                
+                Jump();
+            }
+            else if (extraJumps > 0)
+            {
+                Jump();
+                extraJumps--;
+            }
         }
     }
 
