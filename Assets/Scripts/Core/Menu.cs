@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class Menu : MonoBehaviour
 {
-   void Jugar()
+  public void Jugar()
    {
       SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex +1);
    }
